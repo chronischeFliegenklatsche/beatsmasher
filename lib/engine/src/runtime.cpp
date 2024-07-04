@@ -68,8 +68,9 @@ namespace smash
 
     void Runtime::update()
     {
-        uint64_t currentTime = esp_timer_get_time();
+        g_inputSystem = &m_inputSystem;
 
+        uint64_t currentTime = esp_timer_get_time();
         if (deltaTime >= 0.0)
         {
             for (auto& device : m_inputDevices)
@@ -86,6 +87,7 @@ namespace smash
                     m_display->swapFrameBuffers();
                 }
             }
+            
         }
         
         deltaTime = (double)(esp_timer_get_time() - currentTime) / 1000000.0;
@@ -95,4 +97,5 @@ namespace smash
     {
         m_display = display;
     }
+
 }

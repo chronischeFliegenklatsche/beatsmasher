@@ -17,3 +17,5 @@
 #include "matrix.h"
 #include "behaviourScript.h"
 #include "time.h"
+#include "toneSource.h"
+#include "global.h"

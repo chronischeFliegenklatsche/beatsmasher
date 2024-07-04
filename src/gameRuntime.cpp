@@ -29,7 +29,7 @@ public:
     {
         // Add a button to the input system
         addInputDevice(std::make_shared<smash::Button>("Test_Button", 2));  
-
+        
         // Add scene
         auto sampleScene = std::make_shared<SampleScene>();
         addScene(sampleScene);

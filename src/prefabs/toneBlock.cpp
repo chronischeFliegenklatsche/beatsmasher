@@ -1,50 +1,49 @@
-#ifndef _TONE_BLOCK_H
-#define _TONE_BLOCK_H
+#ifndef _TEST_BLOCK_CPP
+#define _TEST_BLOCK_CPP
 
 #include <smash.h>
-#include "../types/tone.cpp"
 #include "../shaders/dynamicRectFrag.cpp"
-#include "../scripts/move.cpp"
-
-class ToneBlockGenerator;
+#include "../types/tone.cpp"
+#include "../scripts/toneBlockLogic.cpp"
 
 class ToneBlock : public smash::GameObject
 {
-    Tone m_tone;
-    ToneBlockGenerator *m_generator;
 public:
-    static constexpr float s_Speed = 5.0f;
-    ToneBlock() : ToneBlock(Tone(0, 0, 0, 0), smash::Vector2(0, 0), 0) {}
-    ToneBlock(smash::Vector2 position, float length) : ToneBlock(Tone(0, 0, 0, 0), position, length) {}
-    ToneBlock(Tone tone, smash::Vector2 position, float length) : m_tone(tone), m_generator(nullptr)
+    ToneBlock(Tone tone)
     {
         // Initialize transform
-        auto transform = std::make_shared<smash::Transform>(position, smash::Vector2(length, 4));   
-        
-        // Intialize move
-        auto move = std::make_shared<Move>(smash::Vector2::right(), s_Speed);
+        auto transform = std::make_shared<smash::Transform>(1.0f, 1.0f, 5.0f, 5.0f);
+
+        // Initialize shaders
+        auto baseShader = std::make_shared<DynamicRectFragment>();
+
+        // Initialize shader attributes
+        auto shaderAttributes = std::make_shared<smash::ShaderAttributes>();
+        shaderAttributes->setPointer("p_Position", &transform->getPositionRef());
+        shaderAttributes->setPointer("p_Scale", &transform->getScaleRef());
 
         // Initialize shader renderer
         auto shadRenderer = std::make_shared<smash::ShaderRenderer>();
-        
-        // Initialize and add shaders
-        shadRenderer->getShaderProgram().addShader(std::make_shared<DynamicRectFragment>());
-        
-        // Initialize and add shader attributes
-        auto shaderAttr = std::make_shared<smash::ShaderAttributes>();
-        shaderAttr->setPointer("p_Position", (void*)&(transform->getPositionRef()));
-        shaderAttr->setPointer("p_Scale", (void*)&(transform->getScaleRef()));
-        shadRenderer->setShaderAttributes(shaderAttr);
-        
+        shadRenderer->setShaderAttributes(shaderAttributes);
+        shadRenderer->getShaderProgram().addShader(baseShader);
+
+        // Intialize tone source
+        auto toneSource = std::make_shared<smash::ToneSource>();
+        toneSource->setNote(NOTE_A);
+        toneSource->setOctave(4);
+        toneSource->setDuration(tone.duration);
+        toneSource->setSpeakerIndex(0);
+
+        // Initialize tone block logic
+        auto toneBlockLogic = std::make_shared<ToneBlockLogic>();
+
         // Add components
         addComponent(transform);
         addComponent(shadRenderer);
+        addComponent(toneSource);
+        addComponent(toneBlockLogic);
     }
-
-    void setGeneratorForCallback(ToneBlockGenerator *generator)
-    {
-        m_generator = generator;
-    }
+    ~ToneBlock() = default;
 };
 
 #endif

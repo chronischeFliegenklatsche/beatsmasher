@@ -19,3 +19,4 @@
 #include "time.h"
 #include "toneSource.h"
 #include "global.h"
+#include "speaker.h"
